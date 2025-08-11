@@ -11,7 +11,7 @@ const authUser = async (req, res, next) => {
     console.log('4. Token length:', token?.length);
     
     if (!token) {
-      console.log('❌ No token provided');
+      console.log(' No token provided');
       return res.status(401).json({ 
         success: false, 
         message: 'Not Authorized. Please log in again.' 
@@ -22,7 +22,7 @@ const authUser = async (req, res, next) => {
     console.log('6. JWT_SECRET length:', process.env.JWT_SECRET?.length);
     
     if (!process.env.JWT_SECRET) {
-      console.error('❌ JWT_SECRET is not defined');
+      console.error(' JWT_SECRET is not defined');
       return res.status(500).json({ 
         success: false, 
         message: 'Server configuration error' 
@@ -31,16 +31,16 @@ const authUser = async (req, res, next) => {
 
     console.log('7. Attempting to verify token...');
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('8. ✅ Token verified successfully:', decoded);
+    console.log('8.  Token verified successfully:', decoded);
     
     req.userId = decoded.id;
-    console.log('9. ✅ req.userId set to:', req.userId);
+    console.log('9.  req.userId set to:', req.userId);
     console.log('=== END AUTH DEBUG ===');
 
     next();
     
   } catch (error) {
-    console.log('❌ JWT Verification failed:');
+    console.log(' JWT Verification failed:');
     console.log('Error name:', error.name);
     console.log('Error message:', error.message);
     console.log('Full error:', error);
