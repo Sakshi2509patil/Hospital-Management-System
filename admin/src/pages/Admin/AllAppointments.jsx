@@ -1,35 +1,3 @@
-// import React from 'react'
-// import { useContext } from 'react'
-// import { AdminContext } from '../../context/AdminContext'
-// import { useEffect } from 'react'
-
-// const AllAppointments = () => {
-//   const {aToken,appointments,getAllAppointments}=useContext(AdminContext)
-//   useEffect(()=>{
-//     if(aToken){
-//       getAllAppointments()
-//     }
-//   },[aToken])
-//   return (
-//     <div>
-//       <p>All Appointments</p>
-//       <div>
-//         <div>
-//           <p>#</p>
-//           <p>Patient</p>
-//           <p>Age</p>
-//           <p>Date & Time</p>
-//           <p>Doctor</p>
-//           <p>Fees</p>
-//           <p>Action</p>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default AllAppointments
-
 import React from 'react'
 import { useContext } from 'react'
 import { AdminContext } from '../../context/AdminContext'
@@ -44,22 +12,19 @@ const AllAppointments = () => {
       getAllAppointments()
       setLoading(false)
     }
-
-    // Set up interval to refresh appointment status every minute
     const interval = setInterval(() => {
       if (appointments && appointments.length > 0) {
-        // Force re-render to update timeout status dynamically
-        setLoading(prev => !prev ? false : false) // Trigger re-render
+    
+        setLoading(prev => !prev ? false : false) 
       }
-    }, 60000) // Check every minute
+    }, 60000) 
 
     return () => clearInterval(interval)
   }, [aToken, getAllAppointments, appointments])
 
-  // Function to check if appointment is timed out
   const isAppointmentTimedOut = (appointment) => {
     if (appointment.cancelled || appointment.isCompleted) {
-      return false // Already handled, not timed out
+      return false 
     }
 
     try {
@@ -70,28 +35,27 @@ const AllAppointments = () => {
 
       let appointmentDate
 
-      // Handle different date formats
       if (typeof slotDate === 'string') {
-        // Handle formats like "10_8_2025" or "10-8-2025" or "2025-08-10"
+        
         if (slotDate.includes('_')) {
           const [day, month, year] = slotDate.split('_')
           appointmentDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
         } else if (slotDate.includes('-')) {
           const parts = slotDate.split('-')
           if (parts[0].length === 4) {
-            // YYYY-MM-DD format
+           
             appointmentDate = new Date(slotDate)
           } else {
-            // DD-MM-YYYY format
+           
             const [day, month, year] = parts
             appointmentDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
           }
         } else if (slotDate.includes('/')) {
           const parts = slotDate.split('/')
           if (parts[2].length === 4) {
-            // DD/MM/YYYY or MM/DD/YYYY format
+            
             const [first, second, year] = parts
-            // Assume DD/MM/YYYY for international format
+          
             appointmentDate = new Date(parseInt(year), parseInt(second) - 1, parseInt(first))
           }
         } else {
@@ -106,7 +70,6 @@ const AllAppointments = () => {
         return false
       }
 
-      // Parse time (assuming format like "10:30 AM" or "14:30")
       let hours, minutes
       
       if (appointmentTime.includes('AM') || appointmentTime.includes('PM')) {
@@ -115,33 +78,29 @@ const AllAppointments = () => {
         const [h, m] = timeStr.split(':')
         hours = parseInt(h)
         minutes = parseInt(m) || 0
-        
-        // Convert 12-hour to 24-hour format
+      
         if (isPM && hours !== 12) {
           hours += 12
         } else if (!isPM && hours === 12) {
           hours = 0
         }
       } else {
-        // 24-hour format
+       
         const [h, m] = appointmentTime.split(':')
         hours = parseInt(h)
         minutes = parseInt(m) || 0
       }
 
-      // Set the full appointment datetime
+     
       appointmentDate.setHours(hours, minutes, 0, 0)
       
       const now = new Date()
       
-      // Debug logging to check the logic
       console.log(`Checking appointment: ${slotDate} ${appointmentTime}`)
       console.log(`Parsed datetime: ${appointmentDate.toLocaleString()}`)
       console.log(`Current time: ${now.toLocaleString()}`)
       console.log(`Is past time: ${now.getTime() > appointmentDate.getTime()}`)
-      
-      // Consider appointment timed out if current time is past appointment time
-      // No buffer needed - if the appointment time has passed, it's timed out
+  
       return now.getTime() > appointmentDate.getTime()
       
     } catch (error) {
@@ -150,15 +109,12 @@ const AllAppointments = () => {
     }
   }
 
-  // Function to get appointment status
   const getAppointmentStatus = (appointment) => {
     if (appointment.cancelled) return 'cancelled'
     if (appointment.isCompleted) return 'completed'
     if (isAppointmentTimedOut(appointment)) return 'timedout'
     return 'scheduled'
   }
-
-  // Function to cancel appointment - renamed to avoid conflict
   const handleCancelAppointment = async (appointmentId) => {
     try {
       const confirmCancel = window.confirm('Are you sure you want to cancel this appointment?')
@@ -178,7 +134,6 @@ const AllAppointments = () => {
       const data = await response.json()
 
       if (data.success) {
-        // Refresh appointments after cancellation
         await getAllAppointments()
         alert('Appointment cancelled successfully!')
       } else {
@@ -193,8 +148,6 @@ const AllAppointments = () => {
       alert('Failed to cancel appointment. Please try again.')
     }
   }
-
-  // Function to complete appointment
   const handleCompleteAppointment = async (appointmentId) => {
     try {
       const confirmComplete = window.confirm('Mark this appointment as completed?')
@@ -214,7 +167,7 @@ const AllAppointments = () => {
       const data = await response.json()
 
       if (data.success) {
-        // Refresh appointments after completion
+       
         await getAllAppointments()
         alert('Appointment marked as completed!')
       } else {
@@ -230,62 +183,55 @@ const AllAppointments = () => {
     }
   }
 
-  // Function to format date with comprehensive error handling
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A'
     
     let date = null
     
     try {
-      // If it's already a Date object
+    
       if (dateString instanceof Date) {
         date = dateString
       }
-      // If it's a timestamp (number)
+    
       else if (typeof dateString === 'number') {
         date = new Date(dateString)
       }
-      // If it's a string
+ 
       else if (typeof dateString === 'string') {
-        // Handle underscore format like "10_8_2025"
         if (dateString.includes('_')) {
           const [day, month, year] = dateString.split('_')
           date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
         }
-        // Handle dash format
         else if (dateString.includes('-')) {
           const parts = dateString.split('-')
           if (parts[0].length === 4) {
-            // YYYY-MM-DD format
             date = new Date(dateString)
           } else {
-            // DD-MM-YYYY format
             const [day, month, year] = parts
             date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
           }
         }
-        // Handle slash format
         else if (dateString.includes('/')) {
           const parts = dateString.split('/')
           if (parts[2] && parts[2].length === 4) {
-            // DD/MM/YYYY format
+           
             const [day, month, year] = parts
             date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
           } else if (parts[0] && parts[0].length === 4) {
-            // YYYY/MM/DD format
+          
             date = new Date(dateString.replace(/\//g, '-'))
           }
         }
-        // Try standard JavaScript Date parsing
+    
         else {
           date = new Date(dateString)
         }
       }
       
-      // Final validation
       if (!date || isNaN(date.getTime())) {
         console.warn('Unable to parse date:', dateString)
-        return dateString.toString() // Return original string if can't parse
+        return dateString.toString() 
       }
       
       return date.toLocaleDateString('en-US', {
@@ -296,11 +242,10 @@ const AllAppointments = () => {
       
     } catch (error) {
       console.error('Error parsing date:', dateString, error)
-      return dateString.toString() // Return original string on error
+      return dateString.toString() 
     }
   }
 
-  // Function to calculate age
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return 'N/A'
     const today = new Date()
@@ -411,7 +356,6 @@ const AllAppointments = () => {
         </div>
       </div>
 
-      {/* Appointments Table */}
       <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
         <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Appointments List</h2>
