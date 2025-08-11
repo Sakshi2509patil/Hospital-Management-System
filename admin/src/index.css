@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Borel&family=Lumanosimo&family=Outfit:wght@100..900&family=Poppins:wght@600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-scrollbar{
+    @apply hidden
+}
+
+*{
+    font-family: Outfit;
+}
